@@ -1,0 +1,20 @@
+{
+  "name": "Щедрый бог и его любимцы",
+  "interventions": [
+    { "year": 80,  "type": "harvest", "target": "group:0" },
+    { "year": 120, "type": "rain",    "target": "group:0", "radius": 2 },
+    { "year": 150, "type": "drought", "target": "group:1", "radius": 4, "duration": 3 },
+    { "year": 152, "type": "harvest", "target": "group:0" },
+    { "year": 200, "type": "harvest", "target": "group:0" },
+    { "year": 240, "type": "drought", "target": "group:2", "radius": 5, "duration": 4 },
+    { "year": 242, "type": "harvest", "target": "group:0" },
+    { "year": 300, "type": "vision",  "target": "group:0", "message": "love" },
+    { "year": 380, "type": "harvest", "target": "group:0" },
+    { "year": 420, "type": "drought", "target": "largest_group", "radius": 6, "duration": 5 },
+    { "year": 423, "type": "harvest", "target": "group:0" },
+    { "year": 500, "type": "vision",  "target": "random_group", "message": "obedience" },
+    { "year": 600, "type": "lightning", "target": "polity_capital:0" },
+    { "year": 700, "type": "harvest", "target": "group:0" },
+    { "year": 800, "type": "vision",  "target": "largest_group", "message": "knowledge" }
+  ]
+}

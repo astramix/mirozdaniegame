@@ -1,0 +1,27 @@
+; Мироздание — минимальный зритель (ночь 1)
+
+config_version=5
+
+[application]
+
+config/name="Мироздание"
+config/description="Процедурный симулятор Создателя"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[dotnet]
+
+project/assembly_name="Mirozdanie.Game"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

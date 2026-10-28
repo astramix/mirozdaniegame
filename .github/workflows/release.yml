@@ -1,0 +1,62 @@
+name: Release
+
+# Сборка игры под Linux и Windows по тегу v* и публикация в GitHub Releases.
+# Тег с дефисом (v0.2.0-alpha, v0.2.0-rc1) — pre-release; без дефиса (v1.0.0) — обычный выпуск.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  export:
+    strategy:
+      matrix:
+        preset: [Linux, Windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Godot 4.4.1 .NET и шаблоны экспорта
+        run: |
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_mono_linux_x86_64.zip
+          unzip -q godot.zip -d godot
+          curl -sSL -o tpl.tpz https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_mono_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable.mono
+          unzip -q tpl.tpz 'templates/linux_*x86_64' 'templates/windows_*x86_64*' 'templates/version.txt' -d tpl
+          mv tpl/templates/* ~/.local/share/godot/export_templates/4.4.1.stable.mono/
+      - name: Экспорт
+        run: |
+          G=$(ls godot/*/Godot_v4.4.1-stable_mono_linux.x86_64)
+          case "${{ matrix.preset }}" in
+            Linux) out=build/Linux/mirozdanie.x86_64 ;;
+            Windows) out=build/Windows/mirozdanie.exe ;;
+          esac
+          mkdir -p "$(dirname "$out")"
+          $G --headless --path game --export-release "${{ matrix.preset }}" "../$out"
+          test -f "$out"
+      - name: Дымовой тест собранной Linux-версии
+        if: matrix.preset == 'Linux'
+        run: timeout 300 ./build/Linux/mirozdanie.x86_64 --headless -- --smoke | grep "SMOKE OK"
+      - name: Архив
+        run: cd build && zip -qr ../mirozdanie-${{ github.ref_name }}-${{ matrix.preset }}.zip ${{ matrix.preset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mirozdanie-${{ matrix.preset }}
+          path: mirozdanie-${{ github.ref_name }}-${{ matrix.preset }}.zip
+
+  publish:
+    needs: export
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true

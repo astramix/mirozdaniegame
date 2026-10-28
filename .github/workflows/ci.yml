@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, night-1, 'stage/**']
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Сборка
+        run: dotnet build Mirozdanie.sln -c Release -warnaserror
+      - name: Тесты
+        run: dotnet test src/Mirozdanie.Core.Tests -c Release --no-build
+      - name: Бюджеты производительности (регрессия > 20 % роняет сборку)
+        run: dotnet run -c Release --no-build --project src/Mirozdanie.Bench -- --budget --quick
+      - name: Дымовой прогон CLI и Хроника
+        run: |
+          dotnet run -c Release --no-build --project src/Mirozdanie.Cli -- run --seed 42 --years 300 --script examples/drought-prophet.json --out out
+          test -s out/42/chronicle.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chronicle-42
+          path: out/42/
+
+  # Живые тесты зрителя (этап F): Godot без экрана запускает игру и демо-сцены — падение скрипта роняет сборку.
+  godot-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Godot 4.4.1 .NET
+        run: |
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_mono_linux_x86_64.zip
+          unzip -q godot.zip -d godot
+          echo "GODOT=$(ls $PWD/godot/*/Godot_v4.4.1-stable_mono_linux.x86_64)" >> $GITHUB_ENV
+      - name: Сборка зрителя
+        run: dotnet build game/Mirozdanie.Game.csproj -c Debug
+      - name: Дымовой тест и демо-сцены
+        run: |
+          set -e
+          for demo in "" civ war letopis encyclopedia contact finale outcome; do
+            out=$(timeout 600 $GODOT --headless --path game -- --smoke ${demo:+--demo=$demo} 2>&1)
+            echo "$out" | grep -E "SMOKE OK" || { echo "$out" | tail -40; echo "демо «$demo» упало"; exit 1; }
+            if echo "$out" | grep -E "Unhandled exception|System\.[A-Za-z]+Exception"; then echo "исключение в демо «$demo»"; exit 1; fi
+          done

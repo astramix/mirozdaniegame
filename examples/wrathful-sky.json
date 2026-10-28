@@ -1,0 +1,21 @@
+{
+  "name": "Гневное небо",
+  "interventions": [
+    { "year": -150, "type": "meteor", "target": "cell:40,20" },
+    { "year": 60,  "type": "lightning", "target": "largest_group" },
+    { "year": 61,  "type": "lightning", "target": "largest_group" },
+    { "year": 100, "type": "drought", "target": "largest_group", "radius": 6, "duration": 6 },
+    { "year": 180, "type": "vision",  "target": "largest_group", "message": "wrath" },
+    { "year": 260, "type": "meteor",  "target": "random_group", "magnitude": 0.8 },
+    { "year": 300, "type": "drought", "target": "religion_center:0", "radius": 7, "duration": 5 },
+    { "year": 350, "type": "lightning", "target": "polity_capital:0" },
+    { "year": 351, "type": "lightning", "target": "polity_capital:0" },
+    { "year": 352, "type": "lightning", "target": "polity_capital:0" },
+    { "year": 450, "type": "vision",  "target": "random_group", "message": "war" },
+    { "year": 520, "type": "meteor",  "target": "largest_group", "magnitude": 1.0 },
+    { "year": 600, "type": "drought", "target": "largest_group", "radius": 8, "duration": 6 },
+    { "year": 700, "type": "vision",  "target": "largest_group", "message": "freedom" },
+    { "year": 800, "type": "lightning", "target": "polity_capital:0" },
+    { "year": 801, "type": "lightning", "target": "polity_capital:0" }
+  ]
+}

@@ -1,0 +1,15 @@
+bin/
+obj/
+out/
+*.user
+.vs/
+.idea/
+.godot/
+game/.godot/
+BenchmarkDotNet.Artifacts/
+*.log
+TestResults/
+/game/export/
+
+# Сборки игры (tools/export.sh)
+build/
